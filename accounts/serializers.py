@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model, authenticate
 User = get_user_model()
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -22,6 +23,23 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             mobile_number=validated_data.get('mobile_number', '')
         )
         return user
+    
+     # ⭐ Role based response
+    def to_representation(self, instance):
+
+        if instance.role == User.MANAGER:
+            message = "Manager registered successfully"
+        else:
+            message = "Employee registered successfully"
+
+        return {
+            "status": "success",
+            "id": instance.id,
+            "username": instance.username,
+            "email": instance.email,
+            "role": instance.role,
+            "message": message
+        }
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
